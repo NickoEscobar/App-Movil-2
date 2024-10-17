@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Unidades</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #historial {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Conversor de Unidades de Longitud</h1>
+    <input type="number" id="valor" placeholder="Valor a convertir">
+    <select id="unidadInicial">
+        <option value="metros">Metros</option>
+        <option value="kilometros">Kilómetros</option>
+        <option value="centimetros">Centímetros</option>
+    </select>
+    <select id="unidadFinal">
+        <option value="metros">Metros</option>
+        <option value="kilometros">Kilómetros</option>
+        <option value="centimetros">Centímetros</option>
+    </select>
+    <button onclick="convertir()">Convertir</button>
+    <div id="resultado"></div>
+
+    <div id="historial">
+        <h3>Historial de conversiones</h3>
+        <ul id="listaHistorial"></ul>
+    </div>
+
+    <script>
+        // Definición del objeto JSON con información sobre las unidades
+        const unidades = {
+            "metros": {
+                "nombre": "Metros",
+                "equivalencia": {
+                    "kilometros": 0.001,
+                    "centimetros": 100,
+                }
+            },
+            "kilometros": {
+                "nombre": "Kilómetros",
+                "equivalencia": {
+                    "metros": 1000,
+                    "centimetros": 100000,
+                }
+            },
+            "centimetros": {
+                "nombre": "Centímetros",
+                "equivalencia": {
+                    "metros": 0.01,
+                    "kilometros": 0.00001,
+                }
+            }
+        };
+
+        // Historial de conversiones
+        let historial = [];
+
+        function convertir() {
+            const valor = parseFloat(document.getElementById("valor").value);
+            const unidadInicial = document.getElementById("unidadInicial").value;
+            const unidadFinal = document.getElementById("unidadFinal").value;
+
+            let resultado;
+
+            // Lógica de conversión utilizando el JSON
+            if (unidadInicial in unidades && unidadFinal in unidades) {
+                const factorConversion = unidades[unidadInicial].equivalencia[unidadFinal];
+                resultado = valor * factorConversion;
+
+                // Guardar el historial
+                const conversion = {
+                    valor: valor,
+                    unidadInicial: unidades[unidadInicial].nombre,
+                    unidadFinal: unidades[unidadFinal].nombre,
+                    resultado: resultado
+                };
+                historial.push(conversion);
+                mostrarHistorial();
+            } else {
+                resultado = "Unidad no válida";
+            }
+
+            document.getElementById("resultado").textContent = valor + " " + unidades[unidadInicial].nombre + " son " + resultado + " " + unidades[unidadFinal].nombre;
+        }
+
+        function mostrarHistorial() {
+            const listaHistorial = document.getElementById("listaHistorial");
+            listaHistorial.innerHTML = ""; // Limpiar historial actual
+            historial.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = `${item.valor} ${item.unidadInicial} = ${item.resultado} ${item.unidadFinal}`;
+                listaHistorial.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
