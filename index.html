@@ -1,103 +1,136 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Unidades</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        #historial {
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversor con Historial</title>
+<link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    input, select, button {
+      margin: 5px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      background-color: #e0e0e0;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Conversor de Unidades de Longitud</h1>
-    <input type="number" id="valor" placeholder="Valor a convertir">
-    <select id="unidadInicial">
-        <option value="metros">Metros</option>
-        <option value="kilometros">Kilómetros</option>
-        <option value="centimetros">Centímetros</option>
-    </select>
-    <select id="unidadFinal">
-        <option value="metros">Metros</option>
-        <option value="kilometros">Kilómetros</option>
-        <option value="centimetros">Centímetros</option>
-    </select>
-    <button onclick="convertir()">Convertir</button>
-    <div id="resultado"></div>
 
-    <div id="historial">
-        <h3>Historial de conversiones</h3>
-        <ul id="listaHistorial"></ul>
-    </div>
+  <h1>Conversor de Unidades</h1>
 
-    <script>
-        // Definición del objeto JSON con información sobre las unidades
-        const unidades = {
-            "metros": {
-                "nombre": "Metros",
-                "equivalencia": {
-                    "kilometros": 0.001,
-                    "centimetros": 100,
-                }
-            },
-            "kilometros": {
-                "nombre": "Kilómetros",
-                "equivalencia": {
-                    "metros": 1000,
-                    "centimetros": 100000,
-                }
-            },
-            "centimetros": {
-                "nombre": "Centímetros",
-                "equivalencia": {
-                    "metros": 0.01,
-                    "kilometros": 0.00001,
-                }
-            }
-        };
+  <input type="number" id="valor" placeholder="Ingresa un valor" />
 
-        // Historial de conversiones
-        let historial = [];
+  <select id="unidadInicial">
+    <option value="metros">Metros</option>
+    <option value="kilometros">Kilómetros</option>
+    <option value="centimetros">Centímetros</option>
+  </select>
 
-        function convertir() {
-            const valor = parseFloat(document.getElementById("valor").value);
-            const unidadInicial = document.getElementById("unidadInicial").value;
-            const unidadFinal = document.getElementById("unidadFinal").value;
+  <select id="unidadFinal">
+    <option value="metros">Metros</option>
+    <option value="kilometros">Kilómetros</option>
+    <option value="centimetros">Centímetros</option>
+  </select>
 
-            let resultado;
+  <button onclick="convertir()">Convertir</button>
 
-            // Lógica de conversión utilizando el JSON
-            if (unidadInicial in unidades && unidadFinal in unidades) {
-                const factorConversion = unidades[unidadInicial].equivalencia[unidadFinal];
-                resultado = valor * factorConversion;
+  <h2>Resultado:</h2>
+  <p id="resultado"></p>
 
-                // Guardar el historial
-                const conversion = {
-                    valor: valor,
-                    unidadInicial: unidades[unidadInicial].nombre,
-                    unidadFinal: unidades[unidadFinal].nombre,
-                    resultado: resultado
-                };
-                historial.push(conversion);
-                mostrarHistorial();
-            } else {
-                resultado = "Unidad no válida";
-            }
+  <h2>Historial de Conversiones:</h2>
+  <ul id="historial"></ul>
 
-            document.getElementById("resultado").textContent = valor + " " + unidades[unidadInicial].nombre + " son " + resultado + " " + unidades[unidadFinal].nombre;
-        }
+  <script>
+    // Cargar el historial al iniciar la aplicación
+    window.onload = () => {
+      const historialGuardado = cargarHistorial();  
+      if (historialGuardado) {
+        mostrarHistorial(historialGuardado);
+      }
+    };
 
-        function mostrarHistorial() {
-            const listaHistorial = document.getElementById("listaHistorial");
-            listaHistorial.innerHTML = ""; // Limpiar historial actual
-            historial.forEach(item => {
-                const li = document.createElement("li");
-                li.textContent = `${item.valor} ${item.unidadInicial} = ${item.resultado} ${item.unidadFinal}`;
-                listaHistorial.appendChild(li);
-            });
-        }
-    </script>
+    // Función para convertir las unidades
+    function convertir() {
+      const valor = parseFloat(document.getElementById("valor").value);
+      const unidadInicial = document.getElementById("unidadInicial").value;
+      const unidadFinal = document.getElementById("unidadFinal").value;
+      let resultado;
+
+      // Lógica de conversión
+      if (unidadInicial === "metros" && unidadFinal === "kilometros") {
+        resultado = valor / 1000;
+      } else if (unidadInicial === "metros" && unidadFinal === "centimetros") {
+        resultado = valor * 100;
+      } else if (unidadInicial === "metros" && unidadFinal === "metros") {
+        resultado = valor;
+      } else if (unidadInicial === "kilometros" && unidadFinal === "metros") {
+        resultado = valor * 1000;
+      } else if (unidadInicial === "kilometros" && unidadFinal === "centimetros") {
+        resultado = valor * 100000;
+      } else if (unidadInicial === "kilometros" && unidadFinal === "kilometros") {
+        resultado = valor;
+      } else if (unidadInicial === "centimetros" && unidadFinal === "metros") {
+        resultado = valor / 100;
+      } else if (unidadInicial === "centimetros" && unidadFinal === "kilometros") {
+        resultado = valor / 100000;
+      } else if (unidadInicial === "centimetros" && unidadFinal === "centimetros") {
+        resultado = valor;
+      }
+
+      const conversion = `${valor} ${unidadInicial} son ${resultado} ${unidadFinal}`;
+
+      // Mostrar resultado en el DOM
+      document.getElementById("resultado").textContent = conversion;
+
+      // Guardar y mostrar historial
+      guardarEnHistorial(conversion);
+      agregarConversionAlHistorial(conversion);
+    }
+
+    // Función para guardar una conversión en el historial (JSON en localStorage)
+    function guardarEnHistorial(conversion) {
+      const historial = cargarHistorial() || [];
+      historial.push(conversion);
+      localStorage.setItem('historialConversiones', JSON.stringify(historial));
+    }
+
+    // Función para cargar el historial desde localStorage
+    function cargarHistorial() {
+      const historial = localStorage.getItem('historialConversiones');
+      return historial ? JSON.parse(historial) : [];
+    }
+
+    // Función para mostrar el historial completo en el DOM
+    function mostrarHistorial(historial) {
+      historial.forEach(agregarConversionAlHistorial);
+    }
+
+    // Función para agregar una conversión al DOM
+    function agregarConversionAlHistorial(conversion) {
+      const historialElemento = document.getElementById("historial");
+      const listItem = document.createElement('li');
+      listItem.textContent = conversion;
+      historialElemento.appendChild(listItem);
+    }
+  </script>
+
 </body>
 </html>
+
